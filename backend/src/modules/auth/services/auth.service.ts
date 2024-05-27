@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcryptjs';
 import configs from '../../../configs';
 import { User } from '@prisma/client';
-import { UserService } from '../../../modules/users/services/users.service';
+import { UserService } from '../../users/services/users.service';
 import { RolesEnum } from 'src/modules/users/enums/user.role';
 
 @Injectable()

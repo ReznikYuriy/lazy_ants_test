@@ -1,0 +1,65 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:15.3
+    container_name: postgres
+    restart: "no"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - lazy-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: "no"
+    networks:
+      - lazy-network
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - 8080:80
+    depends_on:
+      - postgres
+    volumes:
+      - ./pgadmin4/servers.json:/pgadmin4/servers.json
+    
+  nestjs-api:
+    build:
+      context: ./backend
+    container_name: nestjs-api
+    restart: "always"
+    ports:
+      - 3001:3001
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
+      DEFAULT_ADMIN_EMAIL: ${DEFAULT_ADMIN_EMAIL}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - postgres
+    volumes:
+      - /backend/node_modules
+      - ./backend/src:/user/src/api/src
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+    networks:
+      - lazy-network
+
+networks:
+  lazy-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

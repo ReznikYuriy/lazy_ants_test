@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import configs from '../../../configs';
 import { User } from '@prisma/client';
-import UsersRepository from '../../../modules/users/repositories/users.repository';
+import UsersRepository from '../../users/repositories/users.repository';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
